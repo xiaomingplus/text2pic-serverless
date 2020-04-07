@@ -1,0 +1,6 @@
+{
+    "require": {
+        "dsgygb/text2pic": "~1.2",
+        "vlucas/phpdotenv": "^4.1"
+    }
+}
