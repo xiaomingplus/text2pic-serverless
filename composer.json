@@ -1,6 +1,8 @@
 {
-    "require": {
-        "dsgygb/text2pic": "~1.2",
-        "vlucas/phpdotenv": "^4.1"
-    }
+  "require": {
+    "dsgygb/text2pic": "~1.2",
+    "workerman/workerman": "^4.0",
+    "vlucas/phpdotenv": "^5.3",
+    "upyun/sdk": "^3.5"
+  }
 }

@@ -20,3 +20,9 @@ make start
 ```bash
 make deploy
 ```
+
+Manual:
+
+```bash
+php manual.php start
+```
