@@ -13,7 +13,7 @@ $dotenv->load();
 
 
 // #### http worker ####
-$http_worker = new Worker('http://0.0.0.0:2345');
+$http_worker = new Worker('http://0.0.0.0:80');
 
 // 4 processes
 $http_worker->count = 1;
