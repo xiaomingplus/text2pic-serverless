@@ -1,8 +1,9 @@
 <?php
 extension_loaded('gd');
 require_once __DIR__ . "/vendor/autoload.php";
-require_once 'upyun-php-sdk/upyun.class.php';
 
+use Upyun\Upyun;
+use Upyun\Config;
 use RingCentral\Psr7\Response;
 
 $logger = $GLOBALS['fcLogger'];
@@ -76,15 +77,20 @@ function handler($request, $context): Response
 
         if ($result['code'] == 200) {
             // 到这里图片已生成，下面是上传到upyun的代码
-            $upyun = new UpYun(getenv('UPYUN_BUCKET'), getenv('UPYUN_USER'), getenv('UPYUN_PASSWORD'));
+            $serviceConfig = new Config(getenv('UPYUN_BUCKET'), getenv('UPYUN_USER'), getenv('UPYUN_PASSWORD'));
+            // $serviceConfig = new Config($_ENV['UPYUN_BUCKET'], $_ENV['UPYUN_USER'], $_ENV['UPYUN_PASSWORD']);
+            var_dump($serviceConfig);
+            $upyun = new UpYun($serviceConfig);
             try {
                 $opts = array(
-                    UpYun::CONTENT_MD5 => md5(file_get_contents($result['data']['path']))
+                    'Content-MD5' => md5(file_get_contents($result['data']['path']))
                 );
                 $fh = fopen($result['data']['path'], 'rb');
                 $fileName = '/uploads/' . md5($result['data']['path']) . '.jpg';
-                $rsp = $upyun->writeFile($fileName, $fh, True, $opts);   // 上传图片，自动创建目录
-                fclose($fh);
+                $upyun->write($fileName, $fh);   // 上传图片，自动创建目录
+                if (is_resource($fh)) {
+                    fclose($fh);
+                }
                 unlink($result['data']['path']); //删除服务器的图片
                 $result = array(
                     "code" => 200,

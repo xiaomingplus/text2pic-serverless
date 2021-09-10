@@ -80,7 +80,7 @@ $http_worker->onMessage = function ($connection, $request) {
                 $filePath = $result['data']['path'];
                 $fh = fopen($filePath, 'r');
                 $fileName = '/uploads/' . md5($filePath) . '.jpg';
-                $upyun->write($fileName, $fh);   // 上传图片，自动创建目录
+                $upyun->write($fileName, $fh,);   // 上传图片，自动创建目录
                 if (is_resource($fh)) {
                     fclose($fh);
                 }
