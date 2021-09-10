@@ -1,49 +1,63 @@
 <?php
 
-class UpYunException extends Exception {/*{{{*/
-    public function __construct($message, $code, Exception $previous = null) {
+class UpYunException extends Exception
+{/*{{{*/
+    public function __construct($message, $code, Exception $previous = null)
+    {
         parent::__construct($message, $code);   // For PHP 5.2.x
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
     }
 }/*}}}*/
 
-class UpYunAuthorizationException extends UpYunException {/*{{{*/
-    public function __construct($message, $code = 0, Exception $previous = null) {
+class UpYunAuthorizationException extends UpYunException
+{/*{{{*/
+    public function __construct($message, $code = 0, Exception $previous = null)
+    {
         parent::__construct($message, 401, $previous);
     }
 }/*}}}*/
 
-class UpYunForbiddenException extends UpYunException {/*{{{*/
-    public function __construct($message, $code = 0, Exception $previous = null) {
+class UpYunForbiddenException extends UpYunException
+{/*{{{*/
+    public function __construct($message, $code = 0, Exception $previous = null)
+    {
         parent::__construct($message, 403, $previous);
     }
 }/*}}}*/
 
-class UpYunNotFoundException extends UpYunException {/*{{{*/
-    public function __construct($message, $code = 0, Exception $previous = null) {
+class UpYunNotFoundException extends UpYunException
+{/*{{{*/
+    public function __construct($message, $code = 0, Exception $previous = null)
+    {
         parent::__construct($message, 404, $previous);
     }
 }/*}}}*/
 
-class UpYunNotAcceptableException extends UpYunException {/*{{{*/
-    public function __construct($message, $code = 0, Exception $previous = null) {
+class UpYunNotAcceptableException extends UpYunException
+{/*{{{*/
+    public function __construct($message, $code = 0, Exception $previous = null)
+    {
         parent::__construct($message, 406, $previous);
     }
 }/*}}}*/
 
-class UpYunServiceUnavailable extends UpYunException {/*{{{*/
-    public function __construct($message, $code = 0, Exception $previous = null) {
+class UpYunServiceUnavailable extends UpYunException
+{/*{{{*/
+    public function __construct($message, $code = 0, Exception $previous = null)
+    {
         parent::__construct($message, 503, $previous);
     }
 }/*}}}*/
 
-class UpYun {
+class UpYun
+{
     const VERSION            = '2.0';
 
-/*{{{*/
+    /*{{{*/
     const ED_AUTO            = 'v0.api.upyun.com';
     const ED_TELECOM         = 'v1.api.upyun.com';
     const ED_CNC             = 'v2.api.upyun.com';
@@ -59,7 +73,7 @@ class UpYun {
     const X_GMKERL_VALUE     = 'x-gmkerl-value';
     const X_GMKERL_QUALITY   = 'x­gmkerl-quality';
     const X_GMKERL_UNSHARP   = 'x­gmkerl-unsharp';
-/*}}}*/
+    /*}}}*/
 
     private $_bucketname;
     private $_username;
@@ -79,7 +93,7 @@ class UpYun {
     /**
      * @deprecated
      */
-    private $_file_infos= NULL;
+    private $_file_infos = NULL;
 
     protected $endpoint;
 
@@ -88,27 +102,29 @@ class UpYun {
      */
     private $x_request_id;
 
-	/**
-	* 初始化 UpYun 存储接口
-	* @param $bucketname 空间名称
-	* @param $username 操作员名称
-	* @param $password 密码
-    *
-	* @return object
-	*/
-	public function __construct($bucketname, $username, $password, $endpoint = NULL, $timeout = 30) {/*{{{*/
-		$this->_bucketname = $bucketname;
-		$this->_username = $username;
-		$this->_password = md5($password);
+    /**
+     * 初始化 UpYun 存储接口
+     * @param $bucketname 空间名称
+     * @param $username 操作员名称
+     * @param $password 密码
+     *
+     * @return object
+     */
+    public function __construct($bucketname, $username, $password, $endpoint = NULL, $timeout = 30)
+    {/*{{{*/
+        $this->_bucketname = $bucketname;
+        $this->_username = $username;
+        $this->_password = md5($password);
         $this->_timeout = $timeout;
 
         $this->endpoint = is_null($endpoint) ? self::ED_AUTO : $endpoint;
-	}/*}}}*/
+    }/*}}}*/
 
     /**
      * 获取当前SDK版本号
      */
-    public function version() {
+    public function version()
+    {
         return self::VERSION;
     }
 
@@ -119,7 +135,8 @@ class UpYun {
      *
      * @return void
      */
-    public function makeDir($path, $auto_mkdir = false) {/*{{{*/
+    public function makeDir($path, $auto_mkdir = false)
+    {/*{{{*/
         $headers = array('Folder' => 'true');
         if ($auto_mkdir) $headers['Mkdir'] = 'true';
         return $this->_do_request('PUT', $path, $headers);
@@ -131,7 +148,8 @@ class UpYun {
      *
      * @return boolean
      */
-    public function delete($path) {/*{{{*/
+    public function delete($path)
+    {/*{{{*/
         return $this->_do_request('DELETE', $path);
     }/*}}}*/
 
@@ -143,7 +161,8 @@ class UpYun {
      * @param boolean $auto_mkdir 自动创建目录
      * @param array $opts 可选参数
      */
-    public function writeFile($path, $file, $auto_mkdir = False, $opts = NULL) {/*{{{*/
+    public function writeFile($path, $file, $auto_mkdir = False, $opts = NULL)
+    {/*{{{*/
         if (is_null($opts)) $opts = array();
         if (!is_null($this->_content_md5) || !is_null($this->_file_secret)) {
             //if (!is_null($this->_content_md5)) array_push($opts, self::CONTENT_MD5 . ": {$this->_content_md5}");
@@ -172,7 +191,8 @@ class UpYun {
      *
      * @return mixed
      */
-    public function readFile($path, $file_handle = NULL) {/*{{{*/
+    public function readFile($path, $file_handle = NULL)
+    {/*{{{*/
         return $this->_do_request('GET', $path, NULL, NULL, $file_handle);
     }/*}}}*/
 
@@ -183,13 +203,14 @@ class UpYun {
      *
      * @return mixed
      */
-    public function getList($path = '/') {/*{{{*/
+    public function getList($path = '/')
+    {/*{{{*/
         $rsp = $this->_do_request('GET', $path);
 
         $list = array();
         if ($rsp) {
             $rsp = explode("\n", $rsp);
-            foreach($rsp as $item) {
+            foreach ($rsp as $item) {
                 @list($name, $type, $size, $time) = explode("\t", trim($item));
                 if (!empty($time)) {
                     $type = $type == 'N' ? 'file' : 'folder';
@@ -213,7 +234,8 @@ class UpYun {
      * @param string $path 目录路径
      * @return mixed
      */
-    public function getFolderUsage($path = '/') {/*{{{*/
+    public function getFolderUsage($path = '/')
+    {/*{{{*/
         $rsp = $this->_do_request('GET', '/?usage');
         return floatval($rsp);
     }/*}}}*/
@@ -225,22 +247,24 @@ class UpYun {
      *
      * @return mixed
      */
-    public function getFileInfo($path) {/*{{{*/
+    public function getFileInfo($path)
+    {/*{{{*/
         $rsp = $this->_do_request('HEAD', $path);
 
         return $rsp;
     }/*}}}*/
 
-	/**
-	* 连接签名方法
-	* @param $method 请求方式 {GET, POST, PUT, DELETE}
-	* return 签名字符串
-	*/
-	private function sign($method, $uri, $date, $length){/*{{{*/
+    /**
+     * 连接签名方法
+     * @param $method 请求方式 {GET, POST, PUT, DELETE}
+     * return 签名字符串
+     */
+    private function sign($method, $uri, $date, $length)
+    {/*{{{*/
         //$uri = urlencode($uri);
-		$sign = "{$method}&{$uri}&{$date}&{$length}&{$this->_password}";
-		return 'UpYun '.$this->_username.':'.md5($sign);
-	}/*}}}*/
+        $sign = "{$method}&{$uri}&{$date}&{$length}&{$this->_password}";
+        return 'UpYun ' . $this->_username . ':' . md5($sign);
+    }/*}}}*/
 
     /**
      * HTTP REQUEST 封装
@@ -251,22 +275,24 @@ class UpYun {
      *
      * @return mixed
      */
-    protected function _do_request($method, $path, $headers = NULL, $body= NULL, $file_handle= NULL) {/*{{{*/
+    protected function _do_request($method, $path, $headers = NULL, $body = NULL, $file_handle = NULL)
+    {/*{{{*/
         $uri = "/{$this->_bucketname}{$path}";
+        echo $uri;
         $ch = curl_init("http://{$this->endpoint}{$uri}");
 
         $_headers = array('Expect:');
-        if (!is_null($headers) && is_array($headers)){
-            foreach($headers as $k => $v) {
+        if (!is_null($headers) && is_array($headers)) {
+            foreach ($headers as $k => $v) {
                 array_push($_headers, "{$k}: {$v}");
             }
         }
 
         $length = 0;
-		$date = gmdate('D, d M Y H:i:s \G\M\T');
+        $date = gmdate('D, d M Y H:i:s \G\M\T');
 
         if (!is_null($body)) {
-            if(is_resource($body)){
+            if (is_resource($body)) {
                 fseek($body, 0, SEEK_END);
                 $length = ftell($body);
                 fseek($body, 0);
@@ -283,7 +309,7 @@ class UpYun {
             array_push($_headers, "Content-Length: {$length}");
         }
 
-        array_push($_headers, "Authorization: {$this->sign($method, $uri, $date, $length)}");
+        array_push($_headers, "Authorization: {$this->sign($method,$uri,$date,$length)}");
         array_push($_headers, "Date: {$date}");
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $_headers);
@@ -292,17 +318,17 @@ class UpYun {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
 
         if ($method == 'PUT' || $method == 'POST') {
-			curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POST, 1);
         } else {
-			curl_setopt($ch, CURLOPT_POST, 0);
+            curl_setopt($ch, CURLOPT_POST, 0);
         }
 
         if ($method == 'GET' && is_resource($file_handle)) {
             curl_setopt($ch, CURLOPT_HEADER, 0);
-			curl_setopt($ch, CURLOPT_FILE, $file_handle);
+            curl_setopt($ch, CURLOPT_FILE, $file_handle);
         }
 
         if ($method == 'HEAD') {
@@ -313,7 +339,7 @@ class UpYun {
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if ($http_code == 0) throw new UpYunException('Connection Failed', $http_code);
-
+        var_dump(curl_error($ch));
         curl_close($ch);
 
         $header_string = '';
@@ -338,7 +364,7 @@ class UpYun {
             if (is_null($message) && $method == 'GET' && is_resource($file_handle)) {
                 $message = 'File Not Found';
             }
-            switch($http_code) {
+            switch ($http_code) {
                 case 401:
                     throw new UpYunAuthorizationException($message);
                     break;
@@ -367,15 +393,16 @@ class UpYun {
      *
      * @return array
      */
-    private function _getHeadersData($text) {/*{{{*/
+    private function _getHeadersData($text)
+    {/*{{{*/
         $headers = explode("\r\n", $text);
         $items = array();
-        foreach($headers as $header) {
+        foreach ($headers as $header) {
             $header = trim($header);
-			if(stripos($header, 'x-upyun') !== False){
-				list($k, $v) = explode(':', $header);
-                $items[trim($k)] = in_array(substr($k,8,5), array('width','heigh','frame')) ? intval($v) : trim($v);
-			}
+            if (stripos($header, 'x-upyun') !== False) {
+                list($k, $v) = explode(':', $header);
+                $items[trim($k)] = in_array(substr($k, 8, 5), array('width', 'heigh', 'frame')) ? intval($v) : trim($v);
+            }
         }
         return $items;
     }/*}}}*/
@@ -387,18 +414,21 @@ class UpYun {
      *
      * @return mixed
      */
-    private function _getErrorMessage($header_string) {
+    private function _getErrorMessage($header_string)
+    {
         list($status, $stash) = explode("\r\n", $header_string, 2);
         list($v, $code, $message) = explode(" ", $status, 3);
         return $message . " X-Request-Id: " . $this->getXRequestId();
     }
 
-    private function setXRequestId($header_string) {
+    private function setXRequestId($header_string)
+    {
         preg_match('~^X-Request-Id: ([0-9a-zA-Z]{32})~ism', $header_string, $result);
         $this->x_request_id = isset($result[1]) ? $result[1] : '';
     }
 
-    public function getXRequestId() {
+    public function getXRequestId()
+    {
         return $this->x_request_id;
     }
 
@@ -409,7 +439,8 @@ class UpYun {
      *
      * @return void
      */
-    public function rmDir($path) {/*{{{*/
+    public function rmDir($path)
+    {/*{{{*/
         $this->_do_request('DELETE', $path);
     }/*}}}*/
 
@@ -421,7 +452,8 @@ class UpYun {
      *
      * @return boolean
      */
-    public function deleteFile($path) {/*{{{*/
+    public function deleteFile($path)
+    {/*{{{*/
         $rsp = $this->_do_request('DELETE', $path);
     }/*}}}*/
 
@@ -433,7 +465,8 @@ class UpYun {
      * 
      * @return array
      */
-    public function readDir($path) {/*{{{*/
+    public function readDir($path)
+    {/*{{{*/
         return $this->getList($path);
     }/*}}}*/
 
@@ -443,65 +476,70 @@ class UpYun {
      * @deprecated 推荐直接使用 getFolderUsage('/')来获取
      * @return mixed
      */
-    public function getBucketUsage() {/*{{{*/
+    public function getBucketUsage()
+    {/*{{{*/
         return $this->getFolderUsage('/');
     }/*}}}*/
 
-	/**
-	* 获取文件信息
-    *
-    * #deprecated
-	* @param $file 文件路径（包含文件名）
-	* return array('type'=> file | folder, 'size'=> file size, 'date'=> unix time) 或 null
-	*/
-	//public function getFileInfo($file){/*{{{*/
+    /**
+     * 获取文件信息
+     *
+     * #deprecated
+     * @param $file 文件路径（包含文件名）
+     * return array('type'=> file | folder, 'size'=> file size, 'date'=> unix time) 或 null
+     */
+    //public function getFileInfo($file){/*{{{*/
     //    $result = $this->head($file);
-	//	if(is_null($r))return null;
-	//	return array('type'=> $this->tmp_infos['x-upyun-file-type'], 'size'=> @intval($this->tmp_infos['x-upyun-file-size']), 'date'=> @intval($this->tmp_infos['x-upyun-file-date']));
-	//}/*}}}*/
+    //	if(is_null($r))return null;
+    //	return array('type'=> $this->tmp_infos['x-upyun-file-type'], 'size'=> @intval($this->tmp_infos['x-upyun-file-size']), 'date'=> @intval($this->tmp_infos['x-upyun-file-date']));
+    //}/*}}}*/
 
-	/**
-	* 切换 API 接口的域名
-    *
-    * @deprecated
-	* @param $domain {默然 v0.api.upyun.com 自动识别, v1.api.upyun.com 电信, v2.api.upyun.com 联通, v3.api.upyun.com 移动}
-	* return null;
-	*/
-	public function setApiDomain($domain){/*{{{*/
-		$this->endpoint = $domain;
-	}/*}}}*/
-
-	/**
-	* 设置待上传文件的 Content-MD5 值（如又拍云服务端收到的文件MD5值与用户设置的不一致，将回报 406 Not Acceptable 错误）
-    *
-    * @deprecated
-	* @param $str （文件 MD5 校验码）
-	* return null;
-	*/
-	public function setContentMD5($str){/*{{{*/
-		$this->_content_md5 = $str;
-	}/*}}}*/
-
-	/**
-	* 设置待上传文件的 访问密钥（注意：仅支持图片空！，设置密钥后，无法根据原文件URL直接访问，需带 URL 后面加上 （缩略图间隔标志符+密钥） 进行访问）
-	* 如缩略图间隔标志符为 ! ，密钥为 bac，上传文件路径为 /folder/test.jpg ，那么该图片的对外访问地址为： http://空间域名/folder/test.jpg!bac
-    *
-    * @deprecated
-	* @param $str （文件 MD5 校验码）
-	* return null;
-	*/
-	public function setFileSecret($str){/*{{{*/
-		$this->_file_secret = $str;
-	}/*}}}*/
-
-	/**
+    /**
+     * 切换 API 接口的域名
+     *
      * @deprecated
-	* 获取上传文件后的信息（仅图片空间有返回数据）
-	* @param $key 信息字段名（x-upyun-width、x-upyun-height、x-upyun-frames、x-upyun-file-type）
-	* return value or NULL
-	*/
-	public function getWritedFileInfo($key){/*{{{*/
-		if(!isset($this->_file_infos))return NULL;
-		return $this->_file_infos[$key];
-	}/*}}}*/
+     * @param $domain {默然 v0.api.upyun.com 自动识别, v1.api.upyun.com 电信, v2.api.upyun.com 联通, v3.api.upyun.com 移动}
+     * return null;
+     */
+    public function setApiDomain($domain)
+    {/*{{{*/
+        $this->endpoint = $domain;
+    }/*}}}*/
+
+    /**
+     * 设置待上传文件的 Content-MD5 值（如又拍云服务端收到的文件MD5值与用户设置的不一致，将回报 406 Not Acceptable 错误）
+     *
+     * @deprecated
+     * @param $str （文件 MD5 校验码）
+     * return null;
+     */
+    public function setContentMD5($str)
+    {/*{{{*/
+        $this->_content_md5 = $str;
+    }/*}}}*/
+
+    /**
+     * 设置待上传文件的 访问密钥（注意：仅支持图片空！，设置密钥后，无法根据原文件URL直接访问，需带 URL 后面加上 （缩略图间隔标志符+密钥） 进行访问）
+     * 如缩略图间隔标志符为 ! ，密钥为 bac，上传文件路径为 /folder/test.jpg ，那么该图片的对外访问地址为： http://空间域名/folder/test.jpg!bac
+     *
+     * @deprecated
+     * @param $str （文件 MD5 校验码）
+     * return null;
+     */
+    public function setFileSecret($str)
+    {/*{{{*/
+        $this->_file_secret = $str;
+    }/*}}}*/
+
+    /**
+     * @deprecated
+     * 获取上传文件后的信息（仅图片空间有返回数据）
+     * @param $key 信息字段名（x-upyun-width、x-upyun-height、x-upyun-frames、x-upyun-file-type）
+     * return value or NULL
+     */
+    public function getWritedFileInfo($key)
+    {/*{{{*/
+        if (!isset($this->_file_infos)) return NULL;
+        return $this->_file_infos[$key];
+    }/*}}}*/
 }
